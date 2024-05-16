@@ -19,7 +19,11 @@ Install `pandas`:
 ```
 pip install pandas==2.1.4
 ```
+Install `matplotlib`:
+```
 pip install matplotlib
+```
+Install `jupyter lab`
 
 pip install jupyter lab
 
