@@ -16,6 +16,8 @@ Open the folder and unzip the file named "1976_Sep2016_USPTOgrants_smiles.7z". M
 It is vital to not change the name of the file for the code to work.
 
 ## Installation
+Install the following tools in order to run the code.
+
 Install `pandas`:
 ```
 pip install pandas==2.1.4
@@ -24,10 +26,27 @@ Install `matplotlib`:
 ```
 pip install matplotlib
 ```
-Install `jupyter lab`
+Install `jupyter lab`:
 ```
 pip install jupyter lab
 ```
+Install `chemspipy`:
+```
+pip install chemspipy
+```
+Install `rdkit`:
+```
+pip install rdkit
+```
+Install `pathlib`:
+```
+pip install pathlib:
+```
+Install `pubchempy`
+```
+pip install pubchempy
+```
+
 
 ## Licence 
 MIT Licence
