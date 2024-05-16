@@ -15,7 +15,7 @@ Open the folder and unzip the file named "1976_Sep2016_USPTOgrants_smiles.7z". M
 It is vital to not change the name of the file for the code to work.
 
 ## Installation
-```pip install pandas==2.1.4
+```pip install pandas==2.1.4```
 
 pip install matplotlib
 
