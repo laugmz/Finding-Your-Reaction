@@ -16,6 +16,8 @@ It is vital to not change the name of the file for the code to work.
 
 ## Installation
 pip install pandas==2.1.4
+pip install matplotlib
+pip install jupyter lab
 
 ## Licence 
 MIT Licence
