@@ -20,5 +20,5 @@ def test_answer() :
     assert name2 == "C(#N)C.O1CCCC1>[F][C]1[CH]=[C]([C]#[N])[C]([C]2[CH]=[CH][C]([CH2][C]3[C](=[O])[N]([C@H]4[CH2][CH2][C@H]([O][CH]([CH3])[C]([OH])([CH3])[CH3])[CH2][CH2]4)[C]4[N]([N]=[C]([CH3])[N]=4)[C]=3[CH2][CH2][CH3])=[CH][CH]=2)=[CH][CH]=1", f"Expected C(#N)C.O1CCCC1>[F][C]1[CH]=[C]([C]#[N])[C]([C]2[CH]=[CH][C]([CH2][C]3[C](=[O])[N]([C@H]4[CH2][CH2][C@H]([O][CH]([CH3])[C]([OH])([CH3])[CH3])[CH2][CH2]4)[C]4[N]([N]=[C]([CH3])[N]=4)[C]=3[CH2][CH2][CH3])=[CH][CH]=2)=[CH][CH]=1, but got {name2} instead"
 
     name3 = remove_atom_mapping("[CH2:41]([O:40][C:38]([NH:5][C:18](=[O:20])[C@@H:17]1[CH2:21][CH2:22][CH2:23][NH:16]1)=[O:39])[C:44]1[CH:29]=[CH:28][CH:27]=[CH:26][CH:25]=1")
-    aasert name3 == "[CH2]([O][C]([NH][C](=[O])[C@@H]1[CH2][CH2][CH2][NH]1)=[O])[C]1[CH]=[CH][CH]=[CH][CH]=1", f"Expected [CH2]([O][C]([NH][C](=[O])[C@@H]1[CH2][CH2][CH2][NH]1)=[O])[C]1[CH]=[CH][CH]=[CH][CH]=1, but got {name3} instead"
+    assert name3 == "[CH2]([O][C]([NH][C](=[O])[C@@H]1[CH2][CH2][CH2][NH]1)=[O])[C]1[CH]=[CH][CH]=[CH][CH]=1", f"Expected [CH2]([O][C]([NH][C](=[O])[C@@H]1[CH2][CH2][CH2][NH]1)=[O])[C]1[CH]=[CH][CH]=[CH][CH]=1, but got {name3} instead"
 

@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
 def test_answer() :
     for i in range(100):
-        result = pick_random_entry(dataFrame)
+        result = main(dataFrame)
         assert result.name in dataFrame.index
         assert result["Product 45"] in dataFrame["Product 45"].values
         assert result["Product 3"] in dataFrame["Product 3"].values
