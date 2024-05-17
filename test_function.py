@@ -1,3 +1,4 @@
+import re
 def remove_atom_mapping(smiles):
     """
     Remove atom mapping numbers from a SMILES-like notation.
