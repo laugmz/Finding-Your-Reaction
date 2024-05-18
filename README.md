@@ -1,3 +1,6 @@
+![Alt text](https://www.google.com/search?q=rdkit+chemical+reaction&tbm=isch&ved=2ahUKEwiP37Hx8JaGAxWllv0HHQ_FCbIQ2-cCegQIABAA&oq=rdkit+chemical+reaction&gs_lp=EgNpbWciF3Jka2l0IGNoZW1pY2FsIHJlYWN0aW9uMgcQABiABBgYSOgvUOYIWLUtcAF4AJABAJgBjgGgAa0OqgEEMjQuMbgBA8gBAPgBAYoCC2d3cy13aXotaW1nwgIEECMYJ8ICBhAAGAcYHsICBhAAGAgYHsICBBAAGAPCAggQABiABBixA8ICBRAAGIAEwgIKEAAYgAQYQxiKBcICCRAAGIAEGBgYCogGAQ&sclient=img&ei=JHRIZo-9CKWt9u8Pj4qnkAs&bih=789&biw=1478&prmd=ivnsbtz#imgrc=y46MCKtlyx0m_Ml)
+
+
 # Find your reaction
 Repository used to create the project of Lilou, Eva, and Laura.
 
