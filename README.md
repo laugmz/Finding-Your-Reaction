@@ -3,6 +3,8 @@
 
 
 # Find your reaction
+![Project Logo](https://github.com/laugmz/Amazing-Project/blob/main/reaction.png)
+
 Repository used to create the project of Lilou, Eva, and Laura.
 
 ##  General use of the package
