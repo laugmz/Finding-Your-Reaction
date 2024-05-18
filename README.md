@@ -59,38 +59,33 @@ The functions that have been used throughout the package can be grouped in four 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
 | `remove_atom_mapping` | Removes the atom mapping numbers from a SMILES-like notation|`test_mapping`|
-| `remove_percent_symbol`|Removes the "%" symbol from a percentage value|` test_removepercentage`|
+| `remove_percent_symbol`|Removes the "%" symbol from a percentage value| `test_removepercentage`|
 |`clean_string`|Removes brackets, paranthesis and plus/minus signs|`test_cleanstring`|
+   
 
 2. Function for the input of a molecule:
 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
-| `main` |Inputs a random product|`test_random`|
-
-   
+| `main` | Inputs a random product|`test_randmoness`| 
 
 3. Functions for the analysis of the database:
 
-`is_smiles`
-
-`name_to_smiles`
-
-`compare_molecule_with_data`
-
-`find_molecule_rows`
-
-`generate_permutations`
+|Function name | Function description | Test function |
+|-----------------|-----------------|-----------------|
+| `is_smiles` | Checks if a string represents a valid SMILES notation|`test_`|
+|`name_to_smiles`|Converts a molecule name to a SMILES notation using PubChemPy's PubChem database| `test_`|
+|`compare_molecule_with_data`|Compares the inputted molecule to the ones in the database|`test_`|
+|`find_molecule_rows`|Searches through the specified range of columns in a DataFrame for the input molecule|`test_`|
+|`generate_permutations`|Generates all permutations of the inputted string |`test_`|
 
 4. Functions for the visualization of the results
 
-`get_molecule_name`
-
-`plot_molecule_3D`
-
-`plot_bond`
-
-
+|Function name | Function description | Test function |
+|-----------------|-----------------|-----------------|
+| `get_molecule_name`|Gets the common name of a molecule from its SMILES representation using ChemSpider|`test_`|
+|`plot_molecule_3D`|Plots a molecule in 3D with different colors for different types of atoms and bonds between atoms| `test_`|
+|`plot_bond`|Plots bonds between atoms with different styles for single and double bonds|`test_`|
 
 ## Licence 
 MIT Licence
