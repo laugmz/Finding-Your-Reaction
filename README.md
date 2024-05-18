@@ -55,8 +55,11 @@ pip install pubchempy
 Three types of functions have been used throughout the package in order to get the results.
 
 1. Functions to rearrange the database:
+   
 `remove_atom_mapping
+
 remove_percent_symbol
+
 clean_string`
 
 
