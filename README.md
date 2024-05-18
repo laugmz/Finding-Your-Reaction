@@ -58,19 +58,17 @@ The functions that have been used throughout the package can be grouped in four 
 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
-| `remove_atom_mapping` | Removes the atom mapping numbers from a SMILES-like notation|test_mapping|
-| `remove_percent_symbol`|Removes the "%" symbol from a percentage value| test_removepercentage|
-|`clean_string`|Removes brackets, paranthesis and plus/minus signs|test_cleanstring|
-   
-`remove_atom_mapping`
-
-`remove_percent_symbol`
-
-`clean_string`
+| `remove_atom_mapping` | Removes the atom mapping numbers from a SMILES-like notation|`test_mapping`|
+| `remove_percent_symbol`|Removes the "%" symbol from a percentage value|` test_removepercentage`|
+|`clean_string`|Removes brackets, paranthesis and plus/minus signs|`test_cleanstring`|
 
 2. Function for the input of a molecule:
 
-`main`
+|Function name | Function description | Test function |
+|-----------------|-----------------|-----------------|
+| `main` |Inputs a random product|`test_random`|
+
+   
 
 3. Functions for the analysis of the database:
 
