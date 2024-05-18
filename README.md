@@ -1,4 +1,4 @@
-# Amazing-Project
+# Find your reaction
 Repository used to create the project of Lilou, Eva, and Laura.
 
 ##  Package's Usage
