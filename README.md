@@ -1,7 +1,3 @@
-![Project Logo](https://github.com/laugmz/Amazing-Project/blob/main/reaction.png)
-
-
-
 # Find your reaction
 ![Project Logo](https://github.com/laugmz/Amazing-Project/blob/main/reaction.png)
 
