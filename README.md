@@ -52,15 +52,40 @@ pip install pubchempy
 ```
 
 ## Functions
-Three types of functions have been used throughout the package in order to get the results.
+The functions that have been used throughout the package can be grouped in four different categories.
 
-1. Functions to rearrange the database:
+1. Functions for the rearrangement the database:
    
 `remove_atom_mapping`
 
 `remove_percent_symbol`
 
 `clean_string`
+
+2. Function for the input of a molecule:
+
+`main`
+
+3. Functions for the analysis of the database:
+
+`is_smiles`
+
+`name_to_smiles`
+
+`compare_molecule_with_data`
+
+`find_molecule_rows`
+
+`generate_permutations`
+
+4. Functions for the visualization of the results
+
+`get_molecule_name`
+
+`plot_molecule_3D`
+
+`plot_bond`
+
 
 
 ## Licence 
