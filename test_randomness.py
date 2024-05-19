@@ -4,6 +4,9 @@ from rdkit.Chem import Draw
 from rdkit.Chem import PandasTools
 import pandas as pd
 import os
+import random
+from io import StringIO
+import pytest 
 
 current_directory = Path.cwd()
 print("Current Directory:", current_directory.resolve())
@@ -36,41 +39,50 @@ null_rows = dataFrame[dataFrame["CalculatedYield"].isnull()]
 dataFrame.dropna(subset=["CalculatedYield"], inplace=True)
 
 pd.set_option('display.max_colwidth', None)
+def get_random_product(dataFrame):
+    filtered_columns = [pd.Series(dataFrame.iloc[:, i].dropna().unique()) for i in range(dataFrame.shape[1])]
+    selected_columns = pd.concat(filtered_columns, axis=0)
+    random_products = selected_columns.sample(n=1)
+    return random_products
+
 def main():
-    
     while True:
-        choice=input("Press Enter to get random products or type 'exit' to quit: ")
+        print("Press Enter to get random products or type 'exit' to quit:")
+        choice = input()
         if choice == "exit":
             print("Exiting.")
             break
-        else: 
-            filtered_columns = [pd.Series(dataFrame.iloc[:, i].dropna().unique()) for i in range(128)]
-            selected_columns = pd.concat(filtered_columns, axis=0)
-            random_products = selected_columns.sample(n=1)
+        else:
+            random_products = get_random_product(dataFrame)
             print(random_products)
 
-        
         choice = input("Do you want to continue? (yes/no): ").strip().lower()
         if choice == "no":
             print("Exiting.")
             break
-            
-if __name__ == "__main__":
+
+data = {f'col{i}': [f'value{i}_{j}' for j in range(5)] for i in range(128)}
+dataFrame = pd.DataFrame(data)
+
+def test_get_random_product():
+    result = get_random_product(dataFrame)
+    assert len(result) == 1
+    assert result.iloc[0] in dataFrame.values
+
+def test_main(monkeypatch, capsys):
+    inputs = iter(["", "no"])
+    monkeypatch.setattr('builtins.input', lambda _: next(inputs) if _ else "")
+
     main()
 
-import pytest
+    captured = capsys.readouterr()
+    output_lines = captured.out.split('\n')
 
-def test_answer(monkeypatch):
-    for i in range(100):
-        monkeypatch.setattr('builtins.input', lambda _: "")
-        result = main()
-        if result is not None:
-            assert result.index[0] in dataFrame.columns, f"Product column {result.index[0]} not in DataFrame columns"
-            assert result.iloc[0] in dataFrame[result.index[0]].values, f"Product {result.iloc[0]} not in DataFrame column {result.index[0]}"
+    # Check if the initial prompt is in the output
+    expected_prompt = "Press Enter to get random products or type 'exit' to quit:"
+    assert any(expected_prompt in line.strip() for line in output_lines)
+    # Check if the exit message is in the output
+    assert any("Exiting." in line.strip() for line in output_lines)
 
-
-
-
-
-
-
+if __name__ == "__main__":
+    pytest.main()

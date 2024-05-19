@@ -10,7 +10,10 @@ def remove_percent_symbol(value):
 
 def test_answer() :
     yield1 = remove_percent_symbol("76%")
-    assert yield1 == "76", f"Expected 76, but got {yield1} instead"
+    assert yield1 == "76"
 
     yield2 = remove_percent_symbol("74.3%")
-    assert yield2 == "74.3", f"Expected 74.3, but got {yield2} instead"
+    assert yield2 == "74.3"
+
+    yield3 = remove_percent_symbol(" ")
+    assert yield3 == " "
