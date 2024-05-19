@@ -21,10 +21,10 @@ def name_to_smiles(molecule_name):
 
 def test_answer() :
     mol1 = name_to_smiles("Fluoride")
-    assert mol1 == "[F-]", f"Expected [F-], but got {mol1} instead"
+    assert mol1 == "[F-]"
 
     mol2 = name_to_smiles("Ethanol")
-    assert mol2 == "CCO", f"Expected CCO, but got {mol2} instead"
+    assert mol2 == "CCO"
 
     mol3 = name_to_smiles("Diamine")
-    assert "Error: Unable to retrieve molecule information. Please try with the SMILE of the molecule" in str(e)
+    assert mol3 == "NN" 

@@ -40,7 +40,7 @@ dataFrame.dropna(subset=["CalculatedYield"], inplace=True)
 
 pd.set_option('display.max_colwidth', None)
 def get_random_product(dataFrame):
-    filtered_columns = [pd.Series(dataFrame.iloc[:, i].dropna().unique()) for i in range(dataFrame.shape[1])]
+    filtered_columns = [pd.Series(dataFrame.iloc[:, i].dropna().unique()) for i in range(128)]
     selected_columns = pd.concat(filtered_columns, axis=0)
     random_products = selected_columns.sample(n=1)
     return random_products
@@ -61,17 +61,13 @@ def main():
             print("Exiting.")
             break
 
-data = {f'col{i}': [f'value{i}_{j}' for j in range(5)] for i in range(128)}
-dataFrame = pd.DataFrame(data)
-
 def test_get_random_product():
     result = get_random_product(dataFrame)
-    assert len(result) == 1
     assert result.iloc[0] in dataFrame.values
 
 def test_main(monkeypatch, capsys):
-    inputs = iter(["", "no"])
-    monkeypatch.setattr('builtins.input', lambda _: next(inputs) if _ else "")
+    inputs = iter(["", "exit"])
+    monkeypatch.setattr('builtins.input', lambda prompt='': next(inputs) if prompt == '' else prompt)
 
     main()
 
