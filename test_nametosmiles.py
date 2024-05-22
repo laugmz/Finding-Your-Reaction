@@ -28,3 +28,6 @@ def test_answer() :
 
     mol3 = name_to_smiles("Diamine")
     assert mol3 == "NN" 
+
+    mol4 = name_to_smiles(" ")
+    assert mol4 == None 

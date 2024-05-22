@@ -1,9 +1,7 @@
 import itertools
 
 def generate_permutations(input_string):
-    # Generate all permutations of the input string
     permutations = itertools.permutations(input_string)
-    # Convert each permutation tuple to a string and add to the list
     permutation_list = [''.join(p) for p in permutations]
     return permutation_list
 

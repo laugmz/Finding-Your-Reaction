@@ -23,4 +23,4 @@ def test_answer() :
     assert name3 == "[CH2]([O][C]([NH][C](=[O])[C@@H]1[CH2][CH2][CH2][NH]1)=[O])[C]1[CH]=[CH][CH]=[CH][CH]=1", f"Expected [CH2]([O][C]([NH][C](=[O])[C@@H]1[CH2][CH2][CH2][NH]1)=[O])[C]1[CH]=[CH][CH]=[CH][CH]=1, but got {name3} instead"
 
     name4 = remove_atom_mapping(" ")
-    assert name4 == " ", f"Expected , but got {name3} instead"
+    assert name4 == " ", f"Expected , but got {name4} instead"

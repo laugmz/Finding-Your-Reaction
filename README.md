@@ -71,19 +71,19 @@ The functions that have been used throughout the package can be grouped in four 
 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
-| `is_smiles` | Checks if a string represents a valid SMILES notation|`test_`|
-|`name_to_smiles`|Converts a molecule name to a SMILES notation using PubChemPy's PubChem database| `test_`|
-|`compare_molecule_with_data`|Compares the inputted molecule to the ones in the database|`test_`|
-|`find_molecule_rows`|Searches through the specified range of columns in a DataFrame for the input molecule|`test_`|
-|`generate_permutations`|Generates all permutations of the inputted string |`test_`|
+| `is_smiles` | Checks if a string represents a valid SMILES notation|`test_issmiles.py`|
+|`name_to_smiles`|Converts a molecule name to a SMILES notation using PubChemPy's PubChem database| `test_nametosmiles.py`|
+|`compare_molecule_with_data`|Compares the inputted molecule to the ones in the database|`test_compare.py`|
+|`find_molecule_rows`|Searches through the specified range of columns in a DataFrame for the input molecule|`test_findrow.py`|
+|`generate_permutations`|Generates all permutations of the inputted string |`test_permutations.py`|
 
 4. Functions for the visualization of the results
 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
-| `get_molecule_name`|Gets the common name of a molecule from its SMILES representation using ChemSpider|`test_`|
-|`plot_molecule_3D`|Plots a molecule in 3D with different colors for different types of atoms and bonds between atoms| `test_`|
-|`plot_bond`|Plots bonds between atoms with different styles for single and double bonds|`test_`|
+| `get_molecule_name`|Gets the common name of a molecule from its SMILES representation using ChemSpider|`test_namefromspider.py`|
+|`plot_molecule_3D`|Plots a molecule in 3D with different colors for different types of atoms and bonds between atoms| `test_plot3D.py`|
+|`plot_bond`|Plots bonds between atoms with different styles for single and double bonds (the test tests both functions) |`test_plot3D.py`|
 
 ## Licence 
 MIT Licence

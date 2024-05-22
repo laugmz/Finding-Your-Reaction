@@ -34,7 +34,6 @@ def plot_molecule_3D(smiles):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    # Define colors for different atom types
     atom_colors = {'H': 'gray', 'C': 'black', 'O': 'red', 'N': 'blue', 'F': 'green', 'Br': 'purple', 'Cl': 'yellow'}
 
     # Plot atoms with different colors
@@ -84,12 +83,11 @@ def plot_molecule_3D(smiles):
     # Show plot
     plt.show()
 
-# Sample SMILES strings for testing
-valid_smiles = "CCO"  # Ethanol
+
+valid_smiles = "CCO"  
 invalid_smiles = "invalid_smiles_string"
 
 def test_valid_smiles():
-    # Generate RDKit molecule from SMILES
     mol = Chem.MolFromSmiles(valid_smiles)
     assert mol is not None, "Failed to generate molecule from valid SMILES."
 
@@ -108,19 +106,17 @@ def test_generate_3D_coordinates():
     assert coords is not None and len(coords) > 0, "No 3D coordinates were generated."
 
 def test_plot_molecule_3D_valid_smiles():
-    # This test ensures the function runs without errors for valid SMILES
     try:
         plot_molecule_3D(valid_smiles)
     except Exception as e:
         pytest.fail(f"plot_molecule_3D raised an exception for valid SMILES: {e}")
 
 def test_plot_molecule_3D_invalid_smiles():
-    # This test checks how the function handles invalid SMILES
     captured_output = StringIO()
     sys.stdout = captured_output
     plot_molecule_3D(invalid_smiles)
     sys.stdout = sys.__stdout__
     assert "Error: Unable to generate molecule from SMILES." in captured_output.getvalue()
 
-# To prevent showing the plot during tests
+
 plt.show = lambda: None
