@@ -7,6 +7,10 @@ from rdkit.Chem import PandasTools
 import pandas as pd
 import os
 
+"""
+This part of the code is to shape the data into dataFrame
+"""
+
 # Create a Path object for the current directory
 current_directory = Path.cwd()
 print("Current Directory:", current_directory.resolve())
@@ -80,14 +84,18 @@ def remove_percent_symbol(value):
 dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].apply(remove_percent_symbol)
 
 
-# In[ ]:
-
-
 # Isomers Data Frame
 Isomers_dataFrame = dataFrame.copy()
 
 # Function to remove brackets, parentheses, and plus/minus signs
 def clean_string(s):
+        """
+    Remove the '[,],(,), +, - ' symbols from a SMILES.
+    Arguments:
+    - value (str): The SMILES with the brakets, aprenthesis, plus or minus symbols.
+    Returns:
+    - value_clean (str): The percentage value without the '[,],(,), +, - ' symbols.
+    """
     return re.sub(r'[\[\]\(\)\+\-\#]', '', s)
 
 Isomers_dataFrame = Isomers_dataFrame.astype(str)
@@ -95,9 +103,9 @@ Isomers_dataFrame = dataFrame.apply(lambda x: x.map(clean_string))
 
 print (Isomers_dataFrame)
 
-
-# In[4]:
-
+"""
+This code is for the user to enters the molecule that he/she wants to form
+"""
 
 pd.set_option('display.max_colwidth', None)
 def main():
@@ -123,20 +131,13 @@ if __name__ == "__main__":
     main()
 
 
-# In[27]:
-
 
 # Prompt the user to enter the molecule that he wants to form
 print ("you can enter the name of the molecule or its SMILES, the racemic configuration is available. Only halogen molecules are taken in account in the data base")
 string_input_mol = input("Enter the molecule that you want to form: ")
 
 
-# In[28]:
-
-
-"""
-Function to determine if the user enters the SMILES notation or the usual name of the molecule.
-"""
+# Function to determine if the user enters the SMILES notation or the usual name of the molecule.
 from rdkit import Chem
 
 def is_smiles(smiles):
@@ -158,25 +159,15 @@ if is_smiles(string_input_mol):
 else:
     print(f"'{string_input_mol}' is not a valid SMILES notation.")
 
-
-# In[29]:
-
-
 get_ipython().system('pip install pubchempy')
 
-
-# In[30]:
-
-
-"""
-Function to convert name into SMILES if the input isn't in this form.
-"""
+# Function to convert name into SMILES if the input isn't in this form.
 import pubchempy as pcp
 
 def name_to_smiles(molecule_name):
     """
     Convert a molecule name to a SMILES notation using PubChemPy's PubChem database.
-    Args:
+    Arguments:
     - molecule_name (str): The name of the molecule.
     Returns:
     - smiles (str): The SMILES notation of the molecule, or None if retrieval fails.
@@ -201,8 +192,9 @@ else:
     print (string_input_mol)
 
 
-# In[31]:
-
+"""
+This code is to find the reaction associated with the product we want to form in the database
+"""
 
 import pandas as pd
 
@@ -213,7 +205,7 @@ def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     """
     Search through the specified range of columns in a DataFrame for the input molecule.
     
-    Args:
+    Arguments:
     - dataFrame (pd.DataFrame): The DataFrame to search.
     - string_input_mol (str): The molecule to search for.
     - start_col (int): The starting column index for the search.
@@ -244,10 +236,6 @@ if find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=128):
     print("Rows where the molecule is found:", rows)
 else:
     print("The product is not in the database")
-
-
-
-# In[32]:
 
 
 """
@@ -298,9 +286,6 @@ if find_molecule_rows(valid_smiles_df, string_input_mol, start_col=0, end_col=No
             print("The product is not in the database, please try with another molecule.")
 
 
-# In[33]:
-
-
 """
 This code prints the yield and shows the image of the reaction corresponding
 """
@@ -340,17 +325,7 @@ reaction_image = Draw.ReactionToImage(reaction)
 reaction_image.show()
 
 
-# In[34]:
-
-
-pip install chemspipy
-
-
-# In[35]:
-
-
 "Informations about the product that we want to form"
-
 #name of the molecule
 
 from chemspipy import ChemSpider
@@ -373,8 +348,6 @@ def get_molecule_name(smiles):
 print (get_molecule_name(string_input_mol))
 
 #3D representation of the molecule
-
-
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
