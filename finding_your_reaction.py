@@ -1,15 +1,19 @@
-# read the data and turn it into a dataframe
-#imports"
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import PandasTools
 import pandas as pd
 import os
+import re
 
-"""
-This part of the code is to shape the data into dataFrame
-"""
+def clean_text(text):
+    return re.sub(r'\|[^|]*\|', '', text)
 
 # Create a Path object for the current directory
 current_directory = Path.cwd()
@@ -27,7 +31,7 @@ else:
 
 dataFrame= pd.read_csv("1976_Sep2016_USPTOgrants_smiles.rsmi", delimiter='\t',low_memory=False)
 dataFrame = dataFrame.astype(str)
-dataFrame = dataFrame.map(lambda x: x.split('|f:')[0] if '|f:' in x else x)
+dataFrame["ReactionSmiles"] = dataFrame["ReactionSmiles"].apply(lambda x: clean_text(x))
 #Delete columns that are not the reactions or the yield
 columns_to_delete = ["PatentNumber", "ParagraphNum", "Year", "TextMinedYield"]
 dataFrame.drop(columns=columns_to_delete, inplace=True)
@@ -46,9 +50,15 @@ products_split.columns = [f'Product {i+1}' for i in range(products_split.shape[1
 dataFrame = pd.concat([products_split, dataFrame.iloc[:, 1:]], axis=1)
 dataFrame = dataFrame.loc[:, ~dataFrame.columns.duplicated(keep='first')]
 
-null_rows = dataFrame[dataFrame["CalculatedYield"].isnull()]
-dataFrame.dropna(subset=["CalculatedYield"], inplace=True)
+dataFrame = dataFrame[dataFrame["CalculatedYield"] != 'nan']
 
+
+# In[ ]:
+
+
+"""
+This Cell groups the functions used to clean the dataframe to be able to use it later
+"""
 # Remove atome mapping numbers from smiles
 import re
 
@@ -84,28 +94,25 @@ def remove_percent_symbol(value):
 dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].apply(remove_percent_symbol)
 
 
+# In[3]:
+
+
 # Isomers Data Frame
 Isomers_dataFrame = dataFrame.copy()
 
 # Function to remove brackets, parentheses, and plus/minus signs
 def clean_string(s):
-        """
-    Remove the '[,],(,), +, - ' symbols from a SMILES.
-    Arguments:
-    - value (str): The SMILES with the brakets, aprenthesis, plus or minus symbols.
-    Returns:
-    - value_clean (str): The percentage value without the '[,],(,), +, - ' symbols.
-    """
     return re.sub(r'[\[\]\(\)\+\-\#]', '', s)
 
+columns_to_delete = ["CalculatedYield"]
+Isomers_dataFrame.drop(columns=columns_to_delete, inplace=True)
+Isomers_dataFrame.drop(columns=[col for col in Isomers_dataFrame.columns if col.startswith('Reactant')], inplace=True)
 Isomers_dataFrame = Isomers_dataFrame.astype(str)
-Isomers_dataFrame = dataFrame.apply(lambda x: x.map(clean_string))
+Isomers_dataFrame = Isomers_dataFrame.apply(lambda x: x.map(clean_string))
 
-print (Isomers_dataFrame)
 
-"""
-This code is for the user to enters the molecule that he/she wants to form
-"""
+# In[5]:
+
 
 pd.set_option('display.max_colwidth', None)
 def main():
@@ -116,7 +123,7 @@ def main():
             print("Exiting.")
             break
         else: 
-            filtered_columns = [pd.Series(dataFrame.iloc[:, i].dropna().unique()) for i in range(128)]
+            filtered_columns = [pd.Series(dataFrame.iloc[:, i].dropna().unique()) for i in range(53)]
             selected_columns = pd.concat(filtered_columns, axis=0)
             random_products = selected_columns.sample(n=1)
             print(random_products)
@@ -131,13 +138,20 @@ if __name__ == "__main__":
     main()
 
 
+# In[4]:
+
 
 # Prompt the user to enter the molecule that he wants to form
 print ("you can enter the name of the molecule or its SMILES, the racemic configuration is available. Only halogen molecules are taken in account in the data base")
 string_input_mol = input("Enter the molecule that you want to form: ")
 
 
-# Function to determine if the user enters the SMILES notation or the usual name of the molecule.
+# In[5]:
+
+
+"""
+Function to determine if the user enters the SMILES notation or the usual name of the molecule.
+"""
 from rdkit import Chem
 
 def is_smiles(smiles):
@@ -159,15 +173,25 @@ if is_smiles(string_input_mol):
 else:
     print(f"'{string_input_mol}' is not a valid SMILES notation.")
 
+
+# In[7]:
+
+
 get_ipython().system('pip install pubchempy')
 
-# Function to convert name into SMILES if the input isn't in this form.
+
+# In[6]:
+
+
+"""
+Function to convert name into SMILES if the input isn't in this form.
+"""
 import pubchempy as pcp
 
 def name_to_smiles(molecule_name):
     """
     Convert a molecule name to a SMILES notation using PubChemPy's PubChem database.
-    Arguments:
+    Args:
     - molecule_name (str): The name of the molecule.
     Returns:
     - smiles (str): The SMILES notation of the molecule, or None if retrieval fails.
@@ -185,27 +209,36 @@ def name_to_smiles(molecule_name):
 
 # Call the function to convert the molecule name to SMILES notation
 if is_smiles(string_input_mol)== False:
-    string_input_mol2 = name_to_smiles(string_input_mol)
+    string_input_mol2 = string_input_mol
+    string_input_mol = name_to_smiles(string_input_mol)
     if string_input_mol:
-        print(f"SMILES notation for {string_input_mol}: {string_input_mol2}")
+        print(f"SMILES notation for {string_input_mol2}: {string_input_mol}")
 else:
     print (string_input_mol)
 
 
-"""
-This code is to find the reaction associated with the product we want to form in the database
-"""
+# In[7]:
+
 
 import pandas as pd
+import sys
 
-def compare_molecule_with_data(element, string_input_mol,start_col=0, end_col=None):
+def compare_molecule_with_data(element, string_input_mol, start_col=0, end_col=None):
     return ''.join(element.split()).lower() == ''.join(string_input_mol.split()).lower()
+
+def print_progress(current, total, bar_length=40):
+    progress = current / total
+    block = int(bar_length * progress)
+    bar = '-' * block + '-' * (bar_length - block)
+    percent = progress * 100
+    sys.stdout.write(f'\r[{bar}] {percent:.2f}%')
+    sys.stdout.flush()
 
 def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     """
     Search through the specified range of columns in a DataFrame for the input molecule.
     
-    Arguments:
+    Args:
     - dataFrame (pd.DataFrame): The DataFrame to search.
     - string_input_mol (str): The molecule to search for.
     - start_col (int): The starting column index for the search.
@@ -216,11 +249,15 @@ def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     """
     # Initialize a list to store the row numbers
     rows = []
-    
+
     # Set end_col to the last column index if not provided
     if end_col is None:
         end_col = dataFrame.shape[1]
-    
+
+    # Total number of elements to check
+    total_elements = (end_col - start_col) * len(dataFrame)
+    current_element = 0
+
     # Iterate over the specified range of columns in the DataFrame
     for column_name in dataFrame.columns[start_col:end_col]:
         column = dataFrame[column_name]
@@ -229,13 +266,21 @@ def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
             if compare_molecule_with_data(value, string_input_mol):
                 # Store the row number where the molecule is found
                 rows.append(index)
+            current_element += 1
+            print_progress(current_element, total_elements)
     
+    # Move to the next line after the progress bar
+    print()
     return rows
 
-if find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=128):
+rows = find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=53)
+if rows:
     print("Rows where the molecule is found:", rows)
 else:
     print("The product is not in the database")
+
+
+# In[ ]:
 
 
 """
@@ -251,39 +296,47 @@ def generate_permutations(input_string):
     permutation_list = [''.join(p) for p in permutations]
     return permutation_list
 
-all_isomers=generate_permutations(clean_string(string_input_mol))
-print (all_isomers)
-valid_smiles_isomers=[]
+batch_size = 1050 
 
-for i in range(len(all_isomers)):
-    if is_smiles(all_isomers[i]):
-        valid_smiles_isomers.append(all_isomers[i])
-    else:
-        pass
-valid_smiles_isomers=list(set(valid_smiles_isomers))
-print (valid_smiles_isomers)
+# Get the total number of rows in the DataFrame
+total_rows = len(Isomers_dataFrame)
 
-print (string_input_mol)
-rows = []
+# Iterate over the DataFrame in batches
+for start in range(0, total_rows, batch_size):
+    end = min(start + batch_size, total_rows)
+    batch_df = Isomers_dataFrame.iloc[start:end]
+
+cleaned_string = clean_string(string_input_mol)
+valid_smiles_isomers = []
+
+for perm in generate_permutations(cleaned_string):
+    if is_smiles(perm):
+        valid_smiles_isomers.append(perm)
+
+valid_smiles_isomers = list(set(valid_smiles_isomers))
 
 # Check if the molecule is not found in the valid_smiles_df
-if find_molecule_rows(valid_smiles_df, string_input_mol, start_col=0, end_col=None) == []:
+if not rows:  # Assuming 'rows' is defined somewhere in your context
     choice = input("Your product isn't in the database. Do you want to look for an isomer molecule? (enter yes/no) ")
     if choice.lower() == "no":
         print("Exiting.")
     else:
-        # Iterate over valid_smiles_isomers and append results to 'just'
-        for i in range(len(valid_smiles_isomers)):
-            result = find_molecule_rows(Isomers_dataFrame, valid_smiles_isomers[i], start_col=0, end_col=128)
-            if result:  # Ensure that only non-empty results are appended
-                rows.append(result)
-                
-        rows = [item for sublist in rows for item in sublist]        
-        # Check if any rows were found in 'just' and print the results
+        rows = []
+        for isomer in valid_smiles_isomers:
+            result = find_molecule_rows(batch_df, isomer, start_col=0, end_col=53)
+            if result:
+                rows.extend(result)
+        
+        # Remove duplicates if any
+        rows = list({tuple(row) for row in rows})
+
         if rows:
             print(rows)
         else:
             print("The product is not in the database, please try with another molecule.")
+
+
+# In[ ]:
 
 
 """
@@ -293,7 +346,7 @@ import numpy as np
 # Convert the 'Yield' column to float
 dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].astype(float)
 # Subset the DataFrame to include only the specified rows
-subset_df = dataFrame.iloc[rows]
+subset_df = dataFrame.loc[rows]
 if subset_df['CalculatedYield'].isnull().all():
     # If all values are NaN, randomly select a row as the maximum yield row
     max_yield_row_index = np.random.choice(subset_df.index)
@@ -325,7 +378,17 @@ reaction_image = Draw.ReactionToImage(reaction)
 reaction_image.show()
 
 
+# In[34]:
+
+
+
+
+
+# In[ ]:
+
+
 "Informations about the product that we want to form"
+
 #name of the molecule
 
 from chemspipy import ChemSpider
@@ -348,6 +411,8 @@ def get_molecule_name(smiles):
 print (get_molecule_name(string_input_mol))
 
 #3D representation of the molecule
+
+
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -433,6 +498,9 @@ def plot_molecule_3D(smiles):
     plt.show()
 
 plot_molecule_3D(string_input_mol)
+
+
+# In[ ]:
 
 
 
