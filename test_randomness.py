@@ -4,19 +4,28 @@ from rdkit.Chem import Draw
 from rdkit.Chem import PandasTools
 import pandas as pd
 import os
-import random
-from io import StringIO
-import pytest 
+import re
 
+def clean_text(text):
+    return re.sub(r'\|[^|]*\|', '', text)
+
+# Create a Path object for the current directory
 current_directory = Path.cwd()
 print("Current Directory:", current_directory.resolve())
+
+# Creating a Path object for an example file that does not yet exist
 example_file_path = current_directory / "1976_Sep2016_USPTOgrants_smiles.rsmi"
+
+# Reading the contents of the file to test if we have well acess to our data
 if example_file_path.exists():
     with example_file_path.open("r") as file:
         first_line = file.readline()
 else:
     print("The file does not exist.")
+
 dataFrame= pd.read_csv("1976_Sep2016_USPTOgrants_smiles.rsmi", delimiter='\t',low_memory=False)
+dataFrame = dataFrame.astype(str)
+dataFrame["ReactionSmiles"] = dataFrame["ReactionSmiles"].apply(lambda x: clean_text(x))
 #Delete columns that are not the reactions or the yield
 columns_to_delete = ["PatentNumber", "ParagraphNum", "Year", "TextMinedYield"]
 dataFrame.drop(columns=columns_to_delete, inplace=True)
@@ -26,17 +35,16 @@ new_columns = new_columns.rename(columns={0: 'Reactant 1', 2 : "Product 1"})
 dataFrame = pd.concat([new_columns, dataFrame.iloc[:, 1:]], axis=1)
 dataFrame.drop(columns=1, inplace=True)
 #Separate the reactants from each other
-reactants_split = dataFrame['Reactant 1'].str.split(".", expand = True)
+reactants_split = dataFrame['Reactant 1'].str.split("\.", expand = True)
 reactants_split.columns = [f'Reactant {i+1}' for i in range(reactants_split.shape[1])]
 dataFrame = pd.concat([reactants_split, dataFrame.iloc[:, 1:]], axis=1)
 #Separate the Products from each other
-products_split = dataFrame['Product 1'].str.split(".", expand = True)
+products_split = dataFrame['Product 1'].str.split("\.", expand = True)
 products_split.columns = [f'Product {i+1}' for i in range(products_split.shape[1])]
 dataFrame = pd.concat([products_split, dataFrame.iloc[:, 1:]], axis=1)
 dataFrame = dataFrame.loc[:, ~dataFrame.columns.duplicated(keep='first')]
 
-null_rows = dataFrame[dataFrame["CalculatedYield"].isnull()]
-dataFrame.dropna(subset=["CalculatedYield"], inplace=True)
+dataFrame = dataFrame[dataFrame["CalculatedYield"] != 'nan']
 
 pd.set_option('display.max_colwidth', None)
 def get_random_product(dataFrame):
