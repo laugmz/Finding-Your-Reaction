@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import Draw
@@ -53,9 +47,6 @@ dataFrame = dataFrame.loc[:, ~dataFrame.columns.duplicated(keep='first')]
 dataFrame = dataFrame[dataFrame["CalculatedYield"] != 'nan']
 
 
-# In[ ]:
-
-
 """
 This Cell groups the functions used to clean the dataframe to be able to use it later
 """
@@ -94,9 +85,6 @@ def remove_percent_symbol(value):
 dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].apply(remove_percent_symbol)
 
 
-# In[3]:
-
-
 # Isomers Data Frame
 Isomers_dataFrame = dataFrame.copy()
 
@@ -109,9 +97,6 @@ Isomers_dataFrame.drop(columns=columns_to_delete, inplace=True)
 Isomers_dataFrame.drop(columns=[col for col in Isomers_dataFrame.columns if col.startswith('Reactant')], inplace=True)
 Isomers_dataFrame = Isomers_dataFrame.astype(str)
 Isomers_dataFrame = Isomers_dataFrame.apply(lambda x: x.map(clean_string))
-
-
-# In[5]:
 
 
 pd.set_option('display.max_colwidth', None)
@@ -138,15 +123,10 @@ if __name__ == "__main__":
     main()
 
 
-# In[4]:
-
 
 # Prompt the user to enter the molecule that he wants to form
 print ("you can enter the name of the molecule or its SMILES, the racemic configuration is available. Only halogen molecules are taken in account in the data base")
 string_input_mol = input("Enter the molecule that you want to form: ")
-
-
-# In[5]:
 
 
 """
@@ -174,13 +154,7 @@ else:
     print(f"'{string_input_mol}' is not a valid SMILES notation.")
 
 
-# In[7]:
-
-
 get_ipython().system('pip install pubchempy')
-
-
-# In[6]:
 
 
 """
@@ -217,9 +191,6 @@ else:
     print (string_input_mol)
 
 
-# In[7]:
-
-
 import pandas as pd
 import sys
 
@@ -227,6 +198,15 @@ def compare_molecule_with_data(element, string_input_mol, start_col=0, end_col=N
     return ''.join(element.split()).lower() == ''.join(string_input_mol.split()).lower()
 
 def print_progress(current, total, bar_length=40):
+   """
+    Arguments:
+    current: Represents the current progress of the task. 
+    total: Represents the total number of steps in the task. 
+    bar_length: Represents the length of the progress bar to be displayed. 
+
+    Returns:
+    bar_progression
+   """
     progress = current / total
     block = int(bar_length * progress)
     bar = '-' * block + '-' * (bar_length - block)
@@ -238,7 +218,7 @@ def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     """
     Search through the specified range of columns in a DataFrame for the input molecule.
     
-    Args:
+    Arguments:
     - dataFrame (pd.DataFrame): The DataFrame to search.
     - string_input_mol (str): The molecule to search for.
     - start_col (int): The starting column index for the search.
@@ -278,10 +258,6 @@ if rows:
     print("Rows where the molecule is found:", rows)
 else:
     print("The product is not in the database")
-
-
-# In[ ]:
-
 
 """
 This code finds the isomers (if there is ones) if the product searched isn't in the database.
@@ -336,9 +312,6 @@ if not rows:  # Assuming 'rows' is defined somewhere in your context
             print("The product is not in the database, please try with another molecule.")
 
 
-# In[ ]:
-
-
 """
 This code prints the yield and shows the image of the reaction corresponding
 """
@@ -378,15 +351,6 @@ reaction_image = Draw.ReactionToImage(reaction)
 reaction_image.show()
 
 
-# In[34]:
-
-
-
-
-
-# In[ ]:
-
-
 "Informations about the product that we want to form"
 
 #name of the molecule
@@ -410,9 +374,33 @@ def get_molecule_name(smiles):
 
 print (get_molecule_name(string_input_mol))
 
+# Get the molecular weight of the molecule
+
+def get_molecular_weight(smiles):
+    """
+    Calculate the molecular weight of a molecule given its SMILES string.
+    
+    Args:
+    smiles (str): SMILES string of the molecule.
+    
+    Returns:
+    float: Molecular weight of the molecule.
+    """
+    # Convert the SMILES string to an RDKit molecule object
+    molecule = Chem.MolFromSmiles(smiles)
+    
+    # Check if the molecule is valid
+    if molecule is None:
+        raise ValueError("Invalid SMILES string provided")
+    
+    # Calculate the molecular weight
+    molecular_weight = Descriptors.MolWt(molecule)
+    
+    return molecular_weight
+
+print (get_molecular_weight(string_input_mol))
+
 #3D representation of the molecule
-
-
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -499,8 +487,6 @@ def plot_molecule_3D(smiles):
 
 plot_molecule_3D(string_input_mol)
 
-
-# In[ ]:
 
 
 
