@@ -7,6 +7,12 @@ import os
 import re
 
 def clean_text(text):
+        """
+    Arguments:
+    - text (str): This string is expected to potentially contain vertical "|".
+    Returns:
+    -text_clean (str): The characters removed are "|".
+    """
     return re.sub(r'\|[^|]*\|', '', text)
 
 # Create a Path object for the current directory
@@ -90,6 +96,12 @@ Isomers_dataFrame = dataFrame.copy()
 
 # Function to remove brackets, parentheses, and plus/minus signs
 def clean_string(s):
+    """
+    Arguments:
+    - value (str): This string is expected to potentially contain special characters that need to be removed.
+    Returns:
+    -value_without_caracter (str): The characters removed are [, ], (, ), +, -, and #.
+    """
     return re.sub(r'[\[\]\(\)\+\-\#]', '', s)
 
 columns_to_delete = ["CalculatedYield"]
@@ -101,6 +113,19 @@ Isomers_dataFrame = Isomers_dataFrame.apply(lambda x: x.map(clean_string))
 
 pd.set_option('display.max_colwidth', None)
 def main():
+     """
+    Main function to interactively select and display random products from a DataFrame.
+
+    The function continuously prompts the user to either press Enter to get random products
+    or type 'exit' to quit. Upon pressing Enter, it processes the DataFrame to filter out 
+    unique non-NaN values from the first 53 columns, selects a random product from these values,
+    and prints it. The user is then asked if they want to continue or exit.
+
+    Usage:
+    - Press Enter: To get a random product from the DataFrame.
+    - Type 'exit': To quit the program.
+    - After displaying a random product, type 'yes' to continue or 'no' to exit.
+    """
     
     while True:
         choice=input("Press Enter to get random products or type 'exit' to quit: ")
@@ -137,7 +162,7 @@ from rdkit import Chem
 def is_smiles(smiles):
     """
     Check if a string represents a valid SMILES notation.
-    Args:
+    Arguments:
     - smiles (str): The string to check.
     Returns:
     - is_valid (bool): True if the string is a valid SMILES notation, False otherwise.
@@ -165,7 +190,7 @@ import pubchempy as pcp
 def name_to_smiles(molecule_name):
     """
     Convert a molecule name to a SMILES notation using PubChemPy's PubChem database.
-    Args:
+    Arguments:
     - molecule_name (str): The name of the molecule.
     Returns:
     - smiles (str): The SMILES notation of the molecule, or None if retrieval fails.
@@ -199,13 +224,14 @@ def compare_molecule_with_data(element, string_input_mol, start_col=0, end_col=N
 
 def print_progress(current, total, bar_length=40):
    """
+    Give the status of the reseach
     Arguments:
     current: Represents the current progress of the task. 
     total: Represents the total number of steps in the task. 
     bar_length: Represents the length of the progress bar to be displayed. 
 
     Returns:
-    bar_progression
+    bar_progression: progression of the task
    """
     progress = current / total
     block = int(bar_length * progress)
@@ -266,6 +292,15 @@ This code finds the isomers (if there is ones) if the product searched isn't in 
 import itertools
 
 def generate_permutations(input_string):
+     """
+    Generate all permutations of the characters in the input string.
+
+    Args:
+    - input_string (str): The input string for which permutations are to be generated.
+
+    Returns:
+    - list of str: A list containing all possible permutations of the characters in the input string.
+    """
     # Generate all permutations of the input string
     permutations = itertools.permutations(input_string)
     # Convert each permutation tuple to a string and add to the list
@@ -360,7 +395,7 @@ from chemspipy import ChemSpider
 def get_molecule_name(smiles):
     """
     Get the common name of a molecule from its SMILES representation using ChemSpider.
-    Args:
+    Arguments:
     - smiles (str): SMILES representation of the molecule.
     Returns:
     - name (str): Common name of the molecule.
@@ -380,7 +415,7 @@ def get_molecular_weight(smiles):
     """
     Calculate the molecular weight of a molecule given its SMILES string.
     
-    Args:
+    Arguments:
     smiles (str): SMILES string of the molecule.
     
     Returns:
@@ -411,8 +446,10 @@ import numpy as np
 def plot_molecule_3D(smiles):
     """
     Plot a molecule in 3D with different colors for different types of atoms and bonds between atoms.
-    Args:
+    Arguments:
     - smiles (str): SMILES representation of the molecule.
+    Returns: 
+    - 3D plot image
     """
     # Generate RDKit molecule from SMILES
     mol = Chem.MolFromSmiles(smiles)
