@@ -1,0 +1,50 @@
+name: Python Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    - name: Run tests
+      run: |
+        pytest --junitxml=results.xml
+    - name: Display test results
+      run: |
+        pytest --tb=short --disable-warnings
+        tests_passed=$(pytest --maxfail=1 --disable-warnings | grep -Eo '[0-9]+ passed' | grep -Eo '[0-9]+')
+        total_tests=$(pytest --maxfail=1 --disable-warnings | grep -Eo '[0-9]+ deselected' | grep -Eo '[0-9]+')
+        if [ -z "$tests_passed" ]; then
+          tests_passed=0
+        fi
+        if [ -z "$total_tests" ]; then
+          total_tests=0
+        fi
+        total=$(($tests_passed + $total_tests))
+        if [ "$total" -ne 0 ]; then
+          percentage=$(($tests_passed * 100 / $total))
+        else
+          percentage=0
+        fi
+        echo "Passed: $tests_passed / $total ($percentage%)"
+        echo "## Test Results: $percentage% Passed" > results.txt
+    - name: Upload test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: results.txt
