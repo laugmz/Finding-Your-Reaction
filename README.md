@@ -92,6 +92,7 @@ The functions that have been used throughout the package can be grouped in four 
 | `get_molecule_name`|Gets the common name of a molecule from its SMILES representation using ChemSpider|`test_namefromspider.py`|
 |`plot_molecule_3D`|Plots a molecule in 3D with different colors for different types of atoms and bonds between atoms| `test_plot3D.py`|
 |`plot_bond`|Plots bonds between atoms with different styles for single and double bonds (the test tests both functions) |`test_plot3D.py`|
+![Test Results](https://img.shields.io/badge/tests-0%25%20passed-red)
 
 ## Licence 
 MIT Licence
