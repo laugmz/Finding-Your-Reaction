@@ -6,6 +6,14 @@ Repository used to create the project of Lilou, Eva, and Laura.
 ##  General use of the package
 This package is designed to help one find the formation reaction which bears the highest yield for a wanted molecule through a database.
 
+## Features
+- Transformation of the data into dataframe.
+- Cleaning the dataframe: remove the atom mapping and percent symbol.
+- Generating an isomer dataframe in order to find isomers of the input mol if needed.
+- Search in the dataframe the molecule entered by the user and eventually its isomer.
+- If its found in it, returns the reaction of formation of the molecule.
+- Informations about the product: UPAC name, molecular weight, 3D visualization. 
+
 ## Downloading The Database
 The databse needs to be dowloaded on the user's computer directly before the package can be used.
 First, `clone` the Github repository on your computer.
