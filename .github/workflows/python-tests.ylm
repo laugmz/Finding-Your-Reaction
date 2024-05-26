@@ -22,7 +22,7 @@ jobs:
         pip install pytest
     - name: Run tests
       run: |
-        pytest test_mapping.py
+        pytest test_issmile.py
     - name: Calculate test results
       id: calculate_results
       run: |
