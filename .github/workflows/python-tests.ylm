@@ -19,29 +19,27 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
         pip install pytest
     - name: Run tests
       run: |
-        pytest --junitxml=results.xml
-    - name: Display test results
+        pytest test_mapping.py
+    - name: Calculate test results
+      id: calculate_results
       run: |
-        pytest --tb=short --disable-warnings
-        tests_passed=$(pytest --maxfail=1 --disable-warnings | grep -Eo '[0-9]+ passed' | grep -Eo '[0-9]+')
-        total_tests=$(pytest --maxfail=1 --disable-warnings | grep -Eo '[0-9]+ deselected' | grep -Eo '[0-9]+')
-        if [ -z "$tests_passed" ]; then
-          tests_passed=0
+        total_tests=$(wc -l < test_results.txt)
+        passed_tests=$(grep -c PASSED test_results.txt)
+        if [ -z "$passed_tests" ]; then
+          passed_tests=0
         fi
         if [ -z "$total_tests" ]; then
           total_tests=0
         fi
-        total=$(($tests_passed + $total_tests))
-        if [ "$total" -ne 0 ]; then
-          percentage=$(($tests_passed * 100 / $total))
+        if [ "$total_tests" -ne 0 ]; then
+          percentage=$(($passed_tests * 100 / $total_tests))
         else
           percentage=0
         fi
-        echo "Passed: $tests_passed / $total ($percentage%)"
+        echo "Passed: $passed_tests / $total_tests ($percentage%)"
         echo "## Test Results: $percentage% Passed" > results.txt
     - name: Upload test results
       uses: actions/upload-artifact@v2
