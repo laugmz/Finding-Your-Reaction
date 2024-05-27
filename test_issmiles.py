@@ -3,7 +3,7 @@ from rdkit import Chem
 def is_smiles(smiles):
     """
     Check if a string represents a valid SMILES notation.
-    Args:
+    Arguments:
     - smiles (str): The string to check.
     Returns:
     - is_valid (bool): True if the string is a valid SMILES notation, False otherwise.

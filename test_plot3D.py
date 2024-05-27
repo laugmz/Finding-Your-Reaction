@@ -34,6 +34,7 @@ def plot_molecule_3D(smiles):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
+    # Define colors for different atom types
     atom_colors = {'H': 'gray', 'C': 'black', 'O': 'red', 'N': 'blue', 'F': 'green', 'Br': 'purple', 'Cl': 'yellow'}
 
     # Plot atoms with different colors

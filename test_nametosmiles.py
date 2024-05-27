@@ -3,7 +3,7 @@ import pubchempy as pcp
 def name_to_smiles(molecule_name):
     """
     Convert a molecule name to a SMILES notation using PubChemPy's PubChem database.
-    Args:
+    Arguments:
     - molecule_name (str): The name of the molecule.
     Returns:
     - smiles (str): The SMILES notation of the molecule, or None if retrieval fails.

@@ -2,13 +2,25 @@ import pandas as pd
 import pandas as pd
 from io import StringIO
 
-def compare_molecule_with_data(element, string_input_mol,start_col=0, end_col=None):
+def compare_molecule_with_data(element, string_input_mol, start_col=0, end_col=None):
+    """
+    Compares two strings regardless of spaces differences.
+    
+    Arguments:
+    - two strings (str) to compare 
+    - start_col (int): The starting column index for the search.
+    - end_col (int): The ending column index for the search. If None, searches until the last column.
+    Returns:
+    - value (bool) : True if the two elements are the same, Flase otherwise.
+    """
     return ''.join(element.split()).lower() == ''.join(string_input_mol.split()).lower()
+
+
 def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     """
     Search through the specified range of columns in a DataFrame for the input molecule.
     
-    Args:
+    Arguments:
     - dataFrame (pd.DataFrame): The DataFrame to search.
     - string_input_mol (str): The molecule to search for.
     - start_col (int): The starting column index for the search.
@@ -17,21 +29,26 @@ def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     Returns:
     - List[int]: A list of row indices where the molecule is found.
     """
+    total_elements = (end_col - start_col) * len(dataFrame)
+    with progressbar.ProgressBar(max_value=total_elements, widgets=[progressbar.Percentage(), " ", progressbar.GranularBar()]) as bar:
     # Initialize a list to store the row numbers
-    rows = []
-    
+        rows = []
     # Set end_col to the last column index if not provided
-    if end_col is None:
-        end_col = dataFrame.shape[1]
-    
+        if end_col is None:
+            end_col = dataFrame.shape[1]
+
+    # Total number of elements to check
+        current_element = 0
     # Iterate over the specified range of columns in the DataFrame
-    for column_name in dataFrame.columns[start_col:end_col]:
-        column = dataFrame[column_name]
-        # Check if any element in the column matches the input molecule
-        for index, value in column.items():
-            if compare_molecule_with_data(value, string_input_mol):
-                # Store the row number where the molecule is found
-                rows.append(index)
+        for column_name in dataFrame.columns[start_col:end_col]:
+            column = dataFrame[column_name]  # Get the actual column data
+            for index, value in column.items():
+                if compare_molecule_with_data(value, string_input_mol):
+                    rows.append(index)
+                current_element += 1
+                bar.update(current_element)
+
+    return rows
     
     return rows
 

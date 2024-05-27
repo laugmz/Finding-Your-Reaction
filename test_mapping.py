@@ -2,12 +2,11 @@ import re
 def remove_atom_mapping(smiles):
     """
     Remove atom mapping numbers from a SMILES-like notation.
-    Args:
+    Arguments:
     - smiles (str): The SMILES-like notation with atom mapping numbers.
     Returns:
     - smiles_without_mapping (str): The SMILES notation without atom mapping numbers.
     """
-    # Define a regular expression pattern to match atom mapping numbers
     pattern = r':\d+'
     smiles_without_mapping = re.sub(pattern, '', smiles)
     return smiles_without_mapping
