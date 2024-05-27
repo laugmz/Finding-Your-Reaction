@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.11.5]
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]  # Added Python 3.11 to match your local setup
 
     steps:
     - uses: actions/checkout@v2
@@ -20,33 +20,17 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest
-        # Add additional dependency installations here if needed
-        # pip install some_dependency
+    - name: Debug - List files
+      run: |
+        echo "Root directory contents:"
+        ls -R
     - name: Run tests
       run: |
-        pytest test_plot3D.py --junitxml=results.xml > result.log
+        pytest test_issmiles.py > result.log  # Simplified to match local command
     - name: Display test results
-      id: test_results
-      run: |
-        tests_passed=$(grep -Eo '[0-9]+ passed' result.log | grep -Eo '[0-9]+')
-        total_tests=$(grep -Eo '[0-9]+ deselected' result.log | grep -Eo '[0-9]+')
-        if [ -z "$tests_passed" ]; then
-          tests_passed=0
-        fi
-        if [ -z "$total_tests" ]; then
-          total_tests=0
-        fi
-        total=$(($tests_passed + $total_tests))
-        if [ "$total" -ne 0 ]; then
-          percentage=$(($tests_passed * 100 / $total))
-        else
-          percentage=0
-        fi
-        echo "Passed: $tests_passed / $total_tests ($percentage%)"
-        echo "## Test Results: $percentage% Passed" > results.txt
+      run: cat result.log
     - name: Upload test results
       uses: actions/upload-artifact@v2
       with:
         name: test-results
-        path: results.xml
-
+        path: result.log
