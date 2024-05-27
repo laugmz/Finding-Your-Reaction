@@ -1,18 +1,63 @@
 from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import Draw
+from rdkit.Chem import PandasTools
 import pandas as pd
+import os
 import re
-from rdkit import RDLogger
-import progressbar
 
 def clean_text(text):
-    """
-    Remove some part of reactions that that have the form |f:..| and is useless"
-    Arguments: - string (str) any
-    Returns: - sring (str) without the expression |f:...|. ("..." stands for a squence of numbers
+        """
+    Arguments:
+    - text (str): This string is expected to potentially contain vertical "|".
+    Returns:
+    -text_clean (str): The characters removed are "|".
     """
     return re.sub(r'\|[^|]*\|', '', text)
+
+# Create a Path object for the current directory
+current_directory = Path.cwd()
+print("Current Directory:", current_directory.resolve())
+
+# Creating a Path object for an example file that does not yet exist
+example_file_path = current_directory / "1976_Sep2016_USPTOgrants_smiles.rsmi"
+
+# Reading the contents of the file to test if we have well acess to our data
+if example_file_path.exists():
+    with example_file_path.open("r") as file:
+        first_line = file.readline()
+else:
+    print("The file does not exist.")
+
+dataFrame= pd.read_csv("1976_Sep2016_USPTOgrants_smiles.rsmi", delimiter='\t',low_memory=False)
+dataFrame = dataFrame.astype(str)
+dataFrame["ReactionSmiles"] = dataFrame["ReactionSmiles"].apply(lambda x: clean_text(x))
+#Delete columns that are not the reactions or the yield
+columns_to_delete = ["PatentNumber", "ParagraphNum", "Year", "TextMinedYield"]
+dataFrame.drop(columns=columns_to_delete, inplace=True)
+#Separate the Reactants from the Products
+new_columns = dataFrame['ReactionSmiles'].str.split('>', expand=True)
+new_columns = new_columns.rename(columns={0: 'Reactant 1', 2 : "Product 1"})
+dataFrame = pd.concat([new_columns, dataFrame.iloc[:, 1:]], axis=1)
+dataFrame.drop(columns=1, inplace=True)
+#Separate the reactants from each other
+reactants_split = dataFrame['Reactant 1'].str.split("\.", expand = True)
+reactants_split.columns = [f'Reactant {i+1}' for i in range(reactants_split.shape[1])]
+dataFrame = pd.concat([reactants_split, dataFrame.iloc[:, 1:]], axis=1)
+#Separate the Products from each other
+products_split = dataFrame['Product 1'].str.split("\.", expand = True)
+products_split.columns = [f'Product {i+1}' for i in range(products_split.shape[1])]
+dataFrame = pd.concat([products_split, dataFrame.iloc[:, 1:]], axis=1)
+dataFrame = dataFrame.loc[:, ~dataFrame.columns.duplicated(keep='first')]
+
+dataFrame = dataFrame[dataFrame["CalculatedYield"] != 'nan']
+
+
+"""
+This Cell groups the functions used to clean the dataframe to be able to use it later
+"""
+# Remove atome mapping numbers from smiles
+import re
 
 def remove_atom_mapping(smiles):
     """
@@ -26,80 +71,61 @@ def remove_atom_mapping(smiles):
     smiles_without_mapping = re.sub(pattern, '', smiles)
     return smiles_without_mapping
 
+dataFrame = dataFrame.astype(str)
+columns_to_process = dataFrame.columns[:-1]
+for column in columns_to_process:
+    dataFrame[column] = dataFrame[column].apply(remove_atom_mapping)
+    
+#Remove the percentage symbol
 def remove_percent_symbol(value):
     """
     Remove the '%' symbol from a percentage value.
     Arguments:
     - value (str): The percentage value with the '%' symbol.
     Returns:
-    - value (str): The percentage value without the '%' symbol.
+    - value_without_percent (str): The percentage value without the '%' symbol.
     """
     return value.replace('%', '')
 
+# Apply the remove_percent_symbol function to the "CalculatedYield" column
+dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].apply(remove_percent_symbol)
 
-# Create a Path object for the current directory
-current_directory = Path.cwd()
-# Creating a Path object for an example file that does not yet exist
-example_file_path = current_directory / "1976_Sep2016_USPTOgrants_smiles.rsmi"
 
-# Reading the contents of the file to test if we have well acess to our data
-if example_file_path.exists():
-    with example_file_path.open("r") as file:
-        first_line = file.readline()
-else:
-    print("The file does not exist.")
-print("The database is being processed. It will take a moment, please be patient.")   
-with progressbar.ProgressBar(max_value=17, widgets=[progressbar.Percentage(), " ", progressbar.GranularBar()]) as bar:
-    dataFrame= pd.read_csv("1976_Sep2016_USPTOgrants_smiles.rsmi", delimiter='\t',low_memory=False)
-    bar.update(1)
-    dataFrame = dataFrame.astype(str)
-    dataFrame["ReactionSmiles"] = dataFrame["ReactionSmiles"].apply(lambda x: clean_text(x))
-    bar.update(2)
-#Delete columns that are not the reactions or the yield
-    columns_to_delete = ["PatentNumber", "ParagraphNum", "Year", "TextMinedYield"]
-    dataFrame.drop(columns=columns_to_delete, inplace=True)
-    bar.update(3)
-#Separate the Reactants from the Products
-    new_columns = dataFrame['ReactionSmiles'].str.split('>', expand=True)
-    new_columns = new_columns.rename(columns={0: 'Reactant 1', 2 : "Product 1"})
-    bar.update(4)
-    dataFrame = pd.concat([new_columns, dataFrame.iloc[:, 1:]], axis=1)
-    dataFrame.drop(columns=1, inplace=True)
-    bar.update(5)
-#Separate the reactants from each other
-    reactants_split = dataFrame['Reactant 1'].str.split("\.", expand = True)
-    bar.update(6)
-    reactants_split.columns = [f'Reactant {i+1}' for i in range(reactants_split.shape[1])]
-    dataFrame = pd.concat([reactants_split, dataFrame.iloc[:, 1:]], axis=1)
-    bar.update(7)
-#Separate the Products from each other
-    products_split = dataFrame['Product 1'].str.split("\.", expand = True)
-    bar.update(9)
-    products_split.columns = [f'Product {i+1}' for i in range(products_split.shape[1])]
-    dataFrame = pd.concat([products_split, dataFrame.iloc[:, 1:]], axis=1)
-    bar.update(10)
-    dataFrame = dataFrame.loc[:, ~dataFrame.columns.duplicated(keep='first')]
-    bar.update(11)
+# Isomers Data Frame
+Isomers_dataFrame = dataFrame.copy()
 
-    dataFrame = dataFrame[dataFrame["CalculatedYield"] != 'nan']
-    bar.update(12)
+# Function to remove brackets, parentheses, and plus/minus signs
+def clean_string(s):
+    """
+    Arguments:
+    - value (str): This string is expected to potentially contain special characters that need to be removed.
+    Returns:
+    -value_without_caracter (str): The characters removed are [, ], (, ), +, -, and #.
+    """
+    return re.sub(r'[\[\]\(\)\+\-\#]', '', s)
 
-#Remove atom mapping
-    dataFrame = dataFrame.astype(str)
-    bar.update(14)
-    columns_to_process = dataFrame.columns[:-1]
-    bar.update(15)
-    for column in columns_to_process:
-        dataFrame[column] = dataFrame[column].apply(remove_atom_mapping)
-        bar.update(16)
-#Remove the percentage symbol from the yield's column
-    dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].apply(remove_percent_symbol)
-    bar.update(17)
-print("Processing of the data complete!")
+columns_to_delete = ["CalculatedYield"]
+Isomers_dataFrame.drop(columns=columns_to_delete, inplace=True)
+Isomers_dataFrame.drop(columns=[col for col in Isomers_dataFrame.columns if col.startswith('Reactant')], inplace=True)
+Isomers_dataFrame = Isomers_dataFrame.astype(str)
+Isomers_dataFrame = Isomers_dataFrame.apply(lambda x: x.map(clean_string))
 
 
 pd.set_option('display.max_colwidth', None)
 def main():
+     """
+    Main function to interactively select and display random products from a DataFrame.
+
+    The function continuously prompts the user to either press Enter to get random products
+    or type 'exit' to quit. Upon pressing Enter, it processes the DataFrame to filter out 
+    unique non-NaN values from the first 53 columns, selects a random product from these values,
+    and prints it. The user is then asked if they want to continue or exit.
+
+    Usage:
+    - Press Enter: To get a random product from the DataFrame.
+    - Type 'exit': To quit the program.
+    - After displaying a random product, type 'yes' to continue or 'no' to exit.
+    """
     
     while True:
         choice=input("Press Enter to get random products or type 'exit' to quit: ")
@@ -113,7 +139,7 @@ def main():
             print(random_products)
 
         
-        choice = input("Do you want another isomer ? (yes/no): ").strip().lower()
+        choice = input("Do you want to continue? (yes/no): ").strip().lower()
         if choice == "no":
             print("Exiting.")
             break
@@ -121,10 +147,17 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+
 # Prompt the user to enter the molecule that he wants to form
-print ("you can enter the name of the molecule or its SMILES, the racemic configuration is available.")
+print ("you can enter the name of the molecule or its SMILES, the racemic configuration is available. Only halogen molecules are taken in account in the data base")
 string_input_mol = input("Enter the molecule that you want to form: ")
 
+
+"""
+Function to determine if the user enters the SMILES notation or the usual name of the molecule.
+"""
+from rdkit import Chem
 
 def is_smiles(smiles):
     """
@@ -140,14 +173,18 @@ def is_smiles(smiles):
         return True
 
 # Check if the entered string is a valid SMILES notation
-string_input_mol = remove_atom_mapping(string_input_mol)
 if is_smiles(string_input_mol):
     print(f"'{string_input_mol}' is a valid SMILES notation.")
 else:
     print(f"'{string_input_mol}' is not a valid SMILES notation.")
 
 
-#Convert input into SMILES if it isn't already.
+get_ipython().system('pip install pubchempy')
+
+
+"""
+Function to convert name into SMILES if the input isn't in this form.
+"""
 import pubchempy as pcp
 
 def name_to_smiles(molecule_name):
@@ -176,24 +213,32 @@ if is_smiles(string_input_mol)== False:
     if string_input_mol:
         print(f"SMILES notation for {string_input_mol2}: {string_input_mol}")
 else:
-    print (f"{string_input_mol} is already a SMILES notation.")
+    print (string_input_mol)
 
 
+import pandas as pd
 import sys
 
 def compare_molecule_with_data(element, string_input_mol, start_col=0, end_col=None):
-    """
-    Compares two strings regardless of spaces differences.
-    
-    Arguments:
-    - two strings (str) to compare 
-    - start_col (int): The starting column index for the search.
-    - end_col (int): The ending column index for the search. If None, searches until the last column.
-    Returns:
-    - value (bool) : True if the two elements are the same, Flase otherwise.
-    """
     return ''.join(element.split()).lower() == ''.join(string_input_mol.split()).lower()
 
+def print_progress(current, total, bar_length=40):
+   """
+    Give the status of the reseach
+    Arguments:
+    current: Represents the current progress of the task. 
+    total: Represents the total number of steps in the task. 
+    bar_length: Represents the length of the progress bar to be displayed. 
+
+    Returns:
+    bar_progression: progression of the task
+   """
+    progress = current / total
+    block = int(bar_length * progress)
+    bar = '-' * block + '-' * (bar_length - block)
+    percent = progress * 100
+    sys.stdout.write(f'\r[{bar}] {percent:.2f}%')
+    sys.stdout.flush()
 
 def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     """
@@ -208,87 +253,98 @@ def find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=None):
     Returns:
     - List[int]: A list of row indices where the molecule is found.
     """
-    total_elements = (end_col - start_col) * len(dataFrame)
-    with progressbar.ProgressBar(max_value=total_elements, widgets=[progressbar.Percentage(), " ", progressbar.GranularBar()]) as bar:
     # Initialize a list to store the row numbers
-        rows = []
+    rows = []
+
     # Set end_col to the last column index if not provided
-        if end_col is None:
-            end_col = dataFrame.shape[1]
+    if end_col is None:
+        end_col = dataFrame.shape[1]
 
     # Total number of elements to check
-        current_element = 0
-    # Iterate over the specified range of columns in the DataFrame
-        for column_name in dataFrame.columns[start_col:end_col]:
-            column = dataFrame[column_name]  # Get the actual column data
-            for index, value in column.items():
-                if compare_molecule_with_data(value, string_input_mol):
-                    rows.append(index)
-                current_element += 1
-                bar.update(current_element)
+    total_elements = (end_col - start_col) * len(dataFrame)
+    current_element = 0
 
+    # Iterate over the specified range of columns in the DataFrame
+    for column_name in dataFrame.columns[start_col:end_col]:
+        column = dataFrame[column_name]
+        # Check if any element in the column matches the input molecule
+        for index, value in column.items():
+            if compare_molecule_with_data(value, string_input_mol):
+                # Store the row number where the molecule is found
+                rows.append(index)
+            current_element += 1
+            print_progress(current_element, total_elements)
+    
+    # Move to the next line after the progress bar
+    print()
     return rows
 
-print("Checking if your input is in our database")
 rows = find_molecule_rows(dataFrame, string_input_mol, start_col=0, end_col=53)
-
 if rows:
-    print("Row(s) where the molecule is found:", rows)
+    print("Rows where the molecule is found:", rows)
 else:
     print("The product is not in the database")
 
+"""
+This code finds the isomers (if there is ones) if the product searched isn't in the database.
+"""
 
-from rdkit.Chem import Descriptors
-from rdkit.Chem import rdMolDescriptors
+import itertools
 
-def is_isomer(smiles_given):
-    """
-    Checks if an input has an isomer in a given dataFrame.
-    
+def generate_permutations(input_string):
+     """
+    Generate all permutations of the characters in the input string.
+
     Arguments:
-    - SMILES notation of a molecule (str)
+    - input_string (str): The input string for which permutations are to be generated.
+
     Returns:
-    - Error message (str) if input isn't a SMILES notation
-    - None if no isomer found
-    If found:
-    - Isomer in Smiles notation (str)
-    - Indexes (int) of isomer's column and row
+    - list of str: A list containing all possible permutations of the characters in the input string.
     """
-    if smiles_given is None :
-        return "Invalid SMILES notation, please check input."
-    else:
-        mol1 = Chem.MolFromSmiles(smiles_given)
-        #Give molecular formula
-        formula1 = rdMolDescriptors.CalcMolFormula(mol1)
-    
-    for idx, row in dataFrame.iterrows():
-        for col in dataFrame.columns:
-            if "Product" in col:
-                smiles2 = row[col]
-                if smiles2 == "None":
-                    continue
-                else:
-                    mol2 = Chem.MolFromSmiles(smiles2)
-                    if mol2 is None:
-                        continue
-                    formula2 = rdMolDescriptors.CalcMolFormula(mol2)
-                    if formula1 == formula2:
-                        return smiles2, idx, col
+    # Generate all permutations of the input string
+    permutations = itertools.permutations(input_string)
+    # Convert each permutation tuple to a string and add to the list
+    permutation_list = [''.join(p) for p in permutations]
+    return permutation_list
 
+batch_size = 1050 
 
-if not rows :  
+# Get the total number of rows in the DataFrame
+total_rows = len(Isomers_dataFrame)
+
+# Iterate over the DataFrame in batches
+for start in range(0, total_rows, batch_size):
+    end = min(start + batch_size, total_rows)
+    batch_df = Isomers_dataFrame.iloc[start:end]
+
+cleaned_string = clean_string(string_input_mol)
+valid_smiles_isomers = []
+
+for perm in generate_permutations(cleaned_string):
+    if is_smiles(perm):
+        valid_smiles_isomers.append(perm)
+
+valid_smiles_isomers = list(set(valid_smiles_isomers))
+
+# Check if the molecule is not found in the valid_smiles_df
+if not rows:  # Assuming 'rows' is defined somewhere in your context
     choice = input("Your product isn't in the database. Do you want to look for an isomer molecule? (enter yes/no) ")
     if choice.lower() == "no":
         print("Exiting.")
     else:
-        string_input_mol3 = string_input_mol
-        result = is_isomer(string_input_mol)
-        if result == None:
-            print ("No isomer of the input was found in the database, sorry :(.")
+        rows = []
+        for isomer in valid_smiles_isomers:
+            result = find_molecule_rows(batch_df, isomer, start_col=0, end_col=53)
+            if result:
+                rows.extend(result)
+        
+        # Remove duplicates if any
+        rows = list({tuple(row) for row in rows})
+
+        if rows:
+            print(rows)
         else:
-            string_input_mol, idx, col = result
-            rows = [idx]
-            print(f"The isomer found for {string_input_mol3} is {string_input_mol}, the program will continue with the latter.")
+            print("The product is not in the database, please try with another molecule.")
 
 
 """
@@ -299,11 +355,16 @@ import numpy as np
 dataFrame['CalculatedYield'] = dataFrame['CalculatedYield'].astype(float)
 # Subset the DataFrame to include only the specified rows
 subset_df = dataFrame.loc[rows]
-max_yield_row_index = subset_df['CalculatedYield'].idxmax()
+if subset_df['CalculatedYield'].isnull().all():
+    # If all values are NaN, randomly select a row as the maximum yield row
+    max_yield_row_index = np.random.choice(subset_df.index)
+else:
+    # Find the index of the row with the highest yield
+    max_yield_row_index = subset_df['CalculatedYield'].idxmax()
 # Retrieve the row with the highest yield
 max_yield_row = dataFrame.loc[max_yield_row_index]
-mol_yield = dataFrame.loc[max_yield_row_index]["CalculatedYield"]
-print(f"The reaction ha a yield of {mol_yield}%.")
+print("Row with the highest yield:")
+print(max_yield_row)
 
 # print the reaction
 from rdkit import Chem
@@ -334,7 +395,7 @@ from chemspipy import ChemSpider
 def get_molecule_name(smiles):
     """
     Get the common name of a molecule from its SMILES representation using ChemSpider.
-    Args:
+    Arguments:
     - smiles (str): SMILES representation of the molecule.
     Returns:
     - name (str): Common name of the molecule.
@@ -348,15 +409,13 @@ def get_molecule_name(smiles):
 
 print (get_molecule_name(string_input_mol))
 
-# To print the molecular weight
-from rdkit import Chem
-from rdkit.Chem import Descriptors
+# Get the molecular weight of the molecule
 
 def get_molecular_weight(smiles):
     """
     Calculate the molecular weight of a molecule given its SMILES string.
     
-    Args:
+    Arguments:
     smiles (str): SMILES string of the molecule.
     
     Returns:
@@ -374,7 +433,7 @@ def get_molecular_weight(smiles):
     
     return molecular_weight
 
-print (f"The Molecular weight of the product is {get_molecular_weight(string_input_mol)}.")
+print (get_molecular_weight(string_input_mol))
 
 #3D representation of the molecule
 
@@ -387,8 +446,10 @@ import numpy as np
 def plot_molecule_3D(smiles):
     """
     Plot a molecule in 3D with different colors for different types of atoms and bonds between atoms.
-    Args:
+    Arguments:
     - smiles (str): SMILES representation of the molecule.
+    Returns: 
+    - 3D plot image
     """
     # Generate RDKit molecule from SMILES
     mol = Chem.MolFromSmiles(smiles)
@@ -462,4 +523,8 @@ def plot_molecule_3D(smiles):
     plt.show()
 
 plot_molecule_3D(string_input_mol)
+
+
+
+
 
