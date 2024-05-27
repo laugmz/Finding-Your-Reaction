@@ -1,0 +1,48 @@
+name: Python Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+    - name: Run tests
+      run: |
+        pytest test_issmiles.py
+    - name: Calculate test results
+      id: calculate_results
+      run: |
+        total_tests=$(wc -l < test_results.txt)
+        passed_tests=$(grep -c PASSED test_results.txt)
+        if [ -z "$passed_tests" ]; then
+          passed_tests=0
+        fi
+        if [ -z "$total_tests" ]; then
+          total_tests=0
+        fi
+        if [ "$total_tests" -ne 0 ]; then
+          percentage=$(($passed_tests * 100 / $total_tests))
+        else
+          percentage=0
+        fi
+        echo "Passed: $passed_tests / $total_tests ($percentage%)"
+        echo "## Test Results: $percentage% Passed" > results.txt
+    - name: Upload test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: results.txt
