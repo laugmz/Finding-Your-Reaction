@@ -64,16 +64,17 @@ The functions that have been used throughout the package can be grouped in four 
 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
-| `remove_atom_mapping` | Removes the atom mapping numbers from a SMILES-like notation|`test_mapping`|
-| `remove_percent_symbol`|Removes the "%" symbol from a percentage value| `test_removepercentage`|
-|`clean_string`|Removes brackets, paranthesis and plus/minus signs|`test_cleanstring`|
+| `remove_atom_mapping` | Removes the atom mapping numbers from a SMILES-like notation|`test_mapping.py`|
+| `remove_percent_symbol`|Removes the "%" symbol from a percentage value| `test_removepercentage.py`|
+|`clean_text`|Remove some part of reactions that that have the form |f:..| and is useless|`test_cleantext.py`|
+
    
 
 2. Function for the input of a molecule:
 
 |Function name | Function description | Test function |
 |-----------------|-----------------|-----------------|
-| `main` | Inputs a random product|`test_randmoness`| 
+| `main` | Inputs a random product|`test_randmoness.py`| 
 
 3. Functions for the analysis of the database:
 
@@ -83,7 +84,7 @@ The functions that have been used throughout the package can be grouped in four 
 |`name_to_smiles`|Converts a molecule name to a SMILES notation using PubChemPy's PubChem database| `test_nametosmiles.py`|
 |`compare_molecule_with_data`|Compares the inputted molecule to the ones in the database|`test_compare.py`|
 |`find_molecule_rows`|Searches through the specified range of columns in a DataFrame for the input molecule|`test_findrow.py`|
-|`generate_permutations`|Generates all permutations of the inputted string |`test_permutations.py`|
+|`is_isomer`|Checks if an input has an isomer in the database |`test_isomer.py`|
 
 4. Functions for the visualization of the results
 
@@ -92,6 +93,7 @@ The functions that have been used throughout the package can be grouped in four 
 | `get_molecule_name`|Gets the common name of a molecule from its SMILES representation using ChemSpider|`test_namefromspider.py`|
 |`plot_molecule_3D`|Plots a molecule in 3D with different colors for different types of atoms and bonds between atoms| `test_plot3D.py`|
 |`plot_bond`|Plots bonds between atoms with different styles for single and double bonds (the test tests both functions) |`test_plot3D.py`|
+|`get_molecular_weight`| Get the molecular weight of the input |`test_molecularweight.py`|
 
 ![Test Results](https://img.shields.io/badge/tests-0%25%20passed-red)
 
