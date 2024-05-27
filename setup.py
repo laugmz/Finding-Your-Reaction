@@ -5,7 +5,7 @@ setup(
     version='0.1',
     packages=find_packages(),
     scripts=["finding_your_reaction", "functions", "test_cleantext", "test_compare", "test_findrow", "test_isomer","test_issmiles", "test_mapping", "test_molecularweight", "test_namefromespider", "test_nametosmiles", "test_plot3D", "test_randmoness", "test_removepercentage"],
-    install_requires=["pandas", "matplotlib", "jupyter lab", "chemspipy", "rdkit", "pathlib", "pubchempy"
+    install_requires=["pandas", "matplotlib", "jupyterlab", "chemspipy", "rdkit", "pathlib", "pubchempy"
         # List dependencies here
     ],
     # Other metadata
