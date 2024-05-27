@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: env
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -24,7 +24,7 @@ jobs:
         # pip install some_dependency
     - name: Run tests
       run: |
-        pytest tests/test_issmiles.py --junitxml=results.xml > result.log
+        pytest tests/test_plot3D.py --junitxml=results.xml > result.log
     - name: Display test results
       id: test_results
       run: |
