@@ -1,4 +1,4 @@
-name: Test issmiles
+name: Test Isomer
 
 on: [push, pull_request]
 
@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]  # Added Python 3.11 to match your local setup
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]  # Include Python versions to match your setup
 
     steps:
     - uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
         ls -R
     - name: Run tests
       run: |
-        pytest test_issmiles.py > result.log  # Simplified to match local command
+        pytest test_isomer.py > result.log  # Simplified to match local command
     - name: Display test results
       run: cat result.log
     - name: Upload test results
