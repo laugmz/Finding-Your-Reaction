@@ -34,7 +34,7 @@ jobs:
     - name: Run tests
       run: |
         echo "Running pytest..."
-        pytest tests/ test_isomer.py > result.log
+        pytest finding_your_reaction tests/ test_isomer.py > result.log
         echo "Pytest finished running."
 
     - name: Display test results
