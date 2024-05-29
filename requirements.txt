@@ -11,3 +11,4 @@ matplotlib==3.8.4
 jupyter lab==4.2.1
 chemspipy==2.0.0
 pubchempy==1.0.4
+pathlib
