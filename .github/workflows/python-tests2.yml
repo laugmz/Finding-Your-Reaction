@@ -12,28 +12,36 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Check Python version
       run: python --version
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pytest
+
     - name: Debug - List files
       run: |
         echo "Root directory contents:"
         ls -R
+
     - name: Run tests
-      run: 
-          pytest tests/ test_isomer.py > result.log  # Ensure the path is correct
+      run: |
+        echo "Running pytest..."
+        pytest tests/ test_isomer.py > result.log
+        echo "Pytest finished running."
+
     - name: Display test results
       run: cat result.log
+
     - name: Upload test results
       uses: actions/upload-artifact@v2
       with:
         name: test-results
         path: result.log
-
