@@ -28,7 +28,7 @@ jobs:
         ls -R
     - name: Run tests
       run: |
-        pytest tests test_isomer.py > result.log  # Ensure the path is correct
+        pytest test_isomer.py > result.log  # Ensure the path is correct
     - name: Display test results
       run: cat result.log
     - name: Upload test results
