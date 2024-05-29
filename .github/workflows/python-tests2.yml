@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]  # Include Python versions to match your setup
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]
 
     steps:
     - uses: actions/checkout@v2
@@ -16,6 +16,8 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Check Python version
+      run: python --version
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -26,7 +28,7 @@ jobs:
         ls -R
     - name: Run tests
       run: |
-        pytest tests/ test_isomer.py > result.log  # Simplified to match local command
+        pytest tests/ test_isomer.py > result.log  # Ensure the path is correct
     - name: Display test results
       run: cat result.log
     - name: Upload test results
@@ -34,3 +36,4 @@ jobs:
       with:
         name: test-results
         path: result.log
+
