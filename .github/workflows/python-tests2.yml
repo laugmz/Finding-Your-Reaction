@@ -26,7 +26,7 @@ jobs:
         ls -R
     - name: Run tests
       run: |
-        pytest test/ test_isomer.py > result.log  # Simplified to match local command
+        pytest tests/ test_isomer.py > result.log  # Simplified to match local command
     - name: Display test results
       run: cat result.log
     - name: Upload test results
