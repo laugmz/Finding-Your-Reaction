@@ -39,8 +39,8 @@ def remove_percent_symbol(value):
 
 # Create a Path object for the current directory
 current_directory = Path.cwd()
-# Creating a Path object for an example file that does not yet exist
-example_file_path = current_directory / "1976_Sep2016_USPTOgrants_smiles.rsmi"
+# Creating a Path object for an  file that does not yet exist
+file_path = current_directory / "1976_Sep2016_USPTOgrants_smiles.rsmi"
 
 # Reading the contents of the file to test if we have well acess to our data
 if example_file_path.exists():
@@ -378,6 +378,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from rdkit.Chem import AllChem
 
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from rdkit import Chem
+from rdkit.Chem import AllChem
+
 def plot_molecule_3D(smiles):
     """
     Plot a molecule in 3D with different colors for different types of atoms and bonds between atoms.
@@ -412,15 +418,20 @@ def plot_molecule_3D(smiles):
     for atom_idx, symbol in enumerate(symbols):
         x, y, z = coords[atom_idx]
         color = atom_colors.get(symbol, 'brown')  # Default to brown for unknown atoms
-        ax.scatter(x, y, z, c=color, label=symbol, s=100)
+        ax.scatter(x, y, z, c=color, label=symbol, s=500)
 
     # Helper function to plot bonds
-    def plot_bond(ax, start_pos, end_pos, offset=np.array([0, 0, 0])):
+    def plot_bond(ax, start_pos, end_pos, offset=np.array([0, 0, 0]), color='gray'):
         ax.plot([start_pos[0] + offset[0], end_pos[0] + offset[0]], 
                 [start_pos[1] + offset[1], end_pos[1] + offset[1]], 
-                [start_pos[2] + offset[2], end_pos[2] + offset[2]], c='gray')
+                [start_pos[2] + offset[2], end_pos[2] + offset[2]], c=color)
+    # Scale
+    def scale(ax, start_pos, end_pos, offset=np.array([0, 0, 0])):
+        ax.plot([start_pos[0] + offset[0], end_pos[0] + offset[0]], 
+                [start_pos[1] + offset[1], end_pos[1] + offset[1]], 
+                [start_pos[2] + offset[2], end_pos[2] + offset[2]], c="white")
 
-    # Plot bonds between atoms with different styles for single and double bonds
+    # Plot bonds between atoms with different styles for single, double, and triple bonds
     for bond in mol.GetBonds():
         start_idx = bond.GetBeginAtomIdx()
         end_idx = bond.GetEndAtomIdx()
@@ -437,9 +448,23 @@ def plot_molecule_3D(smiles):
             if np.linalg.norm(normal_vector) < 1e-3:
                 normal_vector = np.cross(bond_vector, np.array([0, 1, 0]))
             normal_vector /= np.linalg.norm(normal_vector)  # Normalize the vector
-            offset = normal_vector * 0.125
+            offset = normal_vector * 0.07
             plot_bond(ax, start_pos, end_pos, offset)
             plot_bond(ax, start_pos, end_pos, -offset)
+        elif bond_type == Chem.rdchem.BondType.TRIPLE:
+            # Calculate two offset directions perpendicular to the bond
+            bond_vector = end_pos - start_pos
+            normal_vector = np.cross(bond_vector, np.array([1, 0, 0]))
+            if np.linalg.norm(normal_vector) < 1e-3:
+                normal_vector = np.cross(bond_vector, np.array([0, 1, 0]))
+            normal_vector /= np.linalg.norm(normal_vector)  # Normalize the vector
+            offset1 = normal_vector*0.01
+            offset2 = normal_vector * 0.1
+            offset3= normal_vector
+            plot_bond(ax, start_pos, end_pos, offset1)
+            plot_bond(ax, start_pos, end_pos, offset2)
+            plot_bond(ax, start_pos, end_pos, -offset2)
+            scale(ax, start_pos, end_pos, offset3)
 
     # Set labels
     ax.set_xlabel('X')
@@ -448,9 +473,10 @@ def plot_molecule_3D(smiles):
     ax.set_title('Molecule in 3D')
 
     # Show legend
+  # Show legend outside the plot
     handles = [plt.Line2D([0], [0], marker='o', color='w', markersize=10, markerfacecolor=color, label=symbol)
                for symbol, color in atom_colors.items()]
-    ax.legend(handles=handles, title='Atom types', loc='best')
+    ax.legend(handles=handles, title='Atom types', bbox_to_anchor=(1.05, 1), loc='upper left')
 
     # Show plot
     plt.show()
