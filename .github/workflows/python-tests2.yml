@@ -27,8 +27,8 @@ jobs:
         echo "Root directory contents:"
         ls -R
     - name: Run tests
-      run: |
-        pytest finding_your_reaction tests/ test_isomer.py > result.log  # Ensure the path is correct
+      run: 
+        pytest tests/ test_isomer.py > result.log  # Ensure the path is correct
     - name: Display test results
       run: cat result.log
     - name: Upload test results
