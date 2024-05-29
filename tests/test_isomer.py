@@ -37,8 +37,8 @@ def is_isomer(smiles_given):
                     if formula1 == formula2:
                         return smiles2, idx, col
 
-dataFrame = pd.DataFrame({"Product1": ["C1=CC=CC=C1", "C1=CC=C1"],
-                                       "Product2": ["C1=CC=CCC=C1", "C1=C1"]})
+
+dataFrame = pd.DataFrame({"Product1": ["C1=CC=CC=C1", "C1=CC=C1"], "Product2": ["C1=CC=CCC=C1", "C1=C1"]})
 
 def test_answer() :
     empty = is_isomer(None)
