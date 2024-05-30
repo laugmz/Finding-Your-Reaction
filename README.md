@@ -95,7 +95,6 @@ The functions that have been used throughout the package can be grouped in four 
 |`plot_bond`|Plots bonds between atoms with different styles for single and double bonds (the test tests both functions) |`test_plot3D.py`|
 |`get_molecular_weight`| Get the molecular weight of the input |`test_molecularweight.py`|
 
-![Test Results](https://img.shields.io/badge/tests-0%25%20passed-red)
 
 ## Licence 
 MIT Licence
